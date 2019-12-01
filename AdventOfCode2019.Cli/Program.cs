@@ -35,12 +35,17 @@ namespace AdventOfCode2019.Cli
             var masses = File
                 .ReadLines("./Data/massesForMyModules.txt")
                 .Select(m => double.TryParse(m, out var mass) ? mass : 0)
-                .Where(m => m > 0);
+                .Where(m => m > 0)
+                .ToList();
 
             var result = FuelCounterUpper.CalculateFuelForMasses(masses);
+            var resultIncludingGasMass = FuelCounterUpper.CalculateFuelForMasses(masses, true);
 
             Console.WriteLine(
-                $"The total fuel required for all the modules in my ship is {result}"
+                $"The total fuel required for all the modules for my ship is {result}"
+            );
+            Console.WriteLine(
+                $"The total fuel required for all the modules (including gas mass) for my ship is {resultIncludingGasMass}"
             );
         }
     }
