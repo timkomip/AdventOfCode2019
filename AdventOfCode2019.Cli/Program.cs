@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using AdventOfCode2019.DayOne;
+using AdventOfCode2019.DayTwo;
 
 namespace AdventOfCode2019.Cli
 {
@@ -18,6 +19,9 @@ namespace AdventOfCode2019.Cli
                 {
                     case 1:
                         DayOne();
+                        break;
+                    case 2:
+                        DayTwo();
                         break;
                     default:
                         Console.Error.WriteLine("Invalid choice");
@@ -46,6 +50,27 @@ namespace AdventOfCode2019.Cli
             );
             Console.WriteLine(
                 $"The total fuel required for all the modules (including gas mass) for my ship is {resultIncludingGasMass}"
+            );
+        }
+
+        static void DayTwo()
+        {
+            var state = File
+                .ReadAllText("./Data/gravityAssistProgram.txt")
+                .Split(',')
+                .Select(int.Parse)
+                .ToList();
+
+            // As per the instructions....
+            state[1] = 12;
+            state[2] = 2;
+
+            var interpreter = new IntcodeInterpreter(state);
+
+            interpreter.Run();
+
+            Console.WriteLine(
+                $"The value at position 0 is {interpreter.State[0]}"
             );
         }
     }
