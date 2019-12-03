@@ -6,6 +6,7 @@ namespace AdventOfCode2019.DayTwo
     public class IntcodeInterpreter
     {
         private int _programCounter;
+
         public IList<int> State { get; }
 
         public IntcodeInterpreter(IList<int> initialState)
@@ -15,53 +16,38 @@ namespace AdventOfCode2019.DayTwo
 
         public void Run()
         {
-            _programCounter = 0;
-            while (State.Count >= _programCounter)
+            ResetProgramCounter();
+            while (ProgramHasMoreInstructions)
             {
-                var opcode = State[_programCounter];
+                switch (Opcode)
+                {
+                    case 1:
+                        Add();
+                        break;
+                    case 2:
+                        Multiply();
+                        break;
+                    case 99:
+                        Terminate();
+                        break;
+                    default:
+                        throw new UnexpectedOpcodeException(Opcode, _programCounter);
+                }
 
-                if (opcode == 1)
-                {
-                    try
-                    {
-                        var leftLocation = State[_programCounter + 1];
-                        var rightLocation = State[_programCounter + 2];
-                        var storageLocation = State[_programCounter + 3];
-                        State[storageLocation] = State[leftLocation] + State[rightLocation];
-                    }
-                    catch (IndexOutOfRangeException e)
-                    {
-                        throw new UnexpectedProgramTermination(e);
-                    }
-
-                    _programCounter += 4;
-                }
-                else if (opcode == 2)
-                {
-                    try
-                    {
-                        var leftLocation = State[_programCounter + 1];
-                        var rightLocation = State[_programCounter + 2];
-                        var storageLocation = State[_programCounter + 3];
-                        State[storageLocation] = State[leftLocation] * State[rightLocation];
-                    }
-                    catch (IndexOutOfRangeException e)
-                    {
-                        throw new UnexpectedProgramTermination(e);
-                    }
-
-                    _programCounter += 4;
-                }
-                else if (opcode == 99)
-                {
-                    break;
-                }
-                else
-                {
-                    throw new UnexpectedOpcodeException(opcode, _programCounter);
-                }
+                IncrementProgramCounter();
             }
         }
+
+        private int Opcode => State[_programCounter];
+        private int LeftOperandIndex => State[_programCounter + 1];
+        private int RightOperandIndex => State[_programCounter + 2];
+        private int ResultIndex => State[_programCounter + 3];
+        private bool ProgramHasMoreInstructions => (State.Count > _programCounter);
+        private void Add() => State[ResultIndex] = State[LeftOperandIndex] + State[RightOperandIndex];
+        private void Multiply() => State[ResultIndex] = State[LeftOperandIndex] * State[RightOperandIndex];
+        private void Terminate() => _programCounter = State.Count;
+        private void ResetProgramCounter() => _programCounter = 0;
+        private void IncrementProgramCounter() => _programCounter += 4;
     }
 
     public class UnexpectedProgramTermination : Exception
